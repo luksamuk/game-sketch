@@ -12,7 +12,7 @@ Before using `game-sketch`, make sure you have the following dependencies:
 * OpenGL 2.x support;
 * SDL2 installed.
 
-If you're using Windows, you can drop the (SDL2 Win32 runtime library)[https://www.libsdl.org/download-2.0.php]
+If you're using Windows, you can drop the [SDL2 Win32 runtime library](https://www.libsdl.org/download-2.0.php)
 on the same folder you've opened your REPL. If you're using Emacs+SLIME/Portacle, just drop it
 on the same folder you've saved your sketch's `.lisp` files or your system.
 
