@@ -80,7 +80,9 @@ You can also manually type it on the REPL.
 (defun my-update (dt)
   (declare (ignore dt))
   (setf *rotation*
-        (mod (1+ *rotation*) 360)))
+        (mod (+ *rotation*
+		(/ dt 500.0))
+	     360)))
 
 (defun my-draw ()
   (gl:with-pushed-matrix
@@ -89,8 +91,7 @@ You can also manually type it on the REPL.
 	   (ash 540 -1)))
     (gsk-util:transform-rotate *rotation*)
     (gsk-util:with-stroke-color '(255 255 255)
-	(gsk-util:line '(-100 0)
-		       '(100 0)))))
+    (gsk-util:rect '(-50 -50) '(100 100) '(10 30 50 70)))))
 
 (gsk:add-update-callback 'my-update)
 (gsk:add-draw-callback 'my-draw)
