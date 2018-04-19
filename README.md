@@ -247,6 +247,7 @@ the end to the center and then to the start, making a pie-like shape). If you wi
 vertex recalculations, I recommend looking at the `transform-*` functions and methods.
 
 * `(rect position size &optional (corner-radius nil))`
+
 [method] Draws a rectangle with the TOP-LEFT CORNER at `position`, with sides of size `size`. `position`
 should be a list of two coordinates, while `size` should be a list with of two dimensions: width and height
 of the rectangle. `corner-radius` is optional, and should always be a list; should it be provided, depending
