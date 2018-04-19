@@ -113,104 +113,130 @@ Will be solved very soon, as this is an easy fix.
 This package stores functions and macros related to the running sketch itself.
 
 * `(next-frame &body body)`
+
 [macro] Evaluates body once, on the next available frame of the application.
 
 * `(add-update-callback update-function)`
+
 [function] Adds `update-function` to the update functions hook.
 
 * `(add-draw-callback draw-function)`
+
 [function] Adds `draw-function` to the draw functions hook.
 
 * `(reset-callbacks)`
+
 [function] Clears all available function hooks.
 
 * `run-sketch`
+
 [function] Runs the current sketch as it is.
 
 ### Utils package (`gsk-util`)
 This package stores functions, macros and variables related to drawing primitives.
 
 * `*fill-state*`
+
 [parameter] Stores the current fill state for primitives (whether they should be filled with a color or not).
 
 * `*stroke-state*`
+
 [parameter] Stores the current stroke state for primitives (whether they should be outlined with a color or not).
 
 * `*fill-color*`
+
 [parameter] A list storing the current fill color.
 
 * `*stroke-color*`
+
 [parameter] A list storing the current outline color.
 
 * `(no-fill)`
+
 [function] Forces the sketch to stop filling primitives with solid colors.
 
 * `(no-stroke)`
+
 [function] Forces the sketch to stop outlining primitives with solid colors.
 
 * `(background ((color list)))`
+
 [method] Changes the background color of the sketch to the given `color` list. The list may have three (red,
 green, blue) or four (red, green, blue, alpha) components. The components are defined in a range [0-255].
 
 * `(stroke ((color number))`
+
 [method] Changes the outline color of the next drawn primitives to `color`. `color` is a single number in the
 range [0-255], which will be used as the red, green and blue color components.
 
 * `(stroke ((color list)))`
+
 [method] Changes the outline color of the next drawn primitives to `color`. `color` is a list of three (red,
 green, blue) or four (red, green, blue, alpha) components. Each component ranges [0-255].
 
 * `(with-stroke-color (color &body body))`
+
 [macro] Changes the outline color to `color` for all primitives drawn on `body`, then forces the sketch to
 stop using outlines at the end. For information on how to specify a color, see the `stroke` methods.
 
 * `(stroke-weight weight)`
+
 [function] Forces the outline to assume a specific level of thickness of `weight`. Defaults to `1.0`.
 
 * `(fill-primitive ((color list)))`
+
 [method] Changes the fill color of the next drawn primitives to `color`. `color` is a list of three (red,
 green, blue) or four (red, green, blue, alpha) components. Each component ranges [0-255].
 
 * `(with-fill-color (color &body body))`
+
 [macro] Changes the fill color to `color` for all primitives drawn on `body`, then forces the sketch to
 stop filling primitives at the end. For information on how to specify a color, see the `fill-primitive` methods.
 
 * `(deg-to-rad deg-angle)`
+
 [macro] Converts an angle `deg-angle` in degrees to radians.
 
 * `(rad-to-deg rad-angle)`
+
 [macro] Converts an angle `rad-angle` in radians to degrees.
 
 * `(transform-rotate angle)`
+
 [function] Rotates the current matrix to `angle`, where `angle` is the angle in radians. I recommend transform
 functions such as this one to be used in association with the `gl:with-pushed-matrix` macro from `cl-opengl`
 system, which should already come as a dependency for this one.
 
 * `(transform-translate ((position list)))`
+
 [method] Translates the current matrix to `position`, where `position` is a list of two or three coordinates
 (the third coordinate is ignored for now, and defaults to 0). I recommend transform functions such as this
 one to be used in association with the `gl:with-pushed-matrix` macro from `cl-opengl` system, which should
 already come as a dependency for this one.
 
 * `(transform-scale ((factors list)))`
+
 [method] Scales the current matrix by `factors`, where `factors` is a list of two or three scaling factors
 (the third factor is ignored for now, and defaults to 1). I recommend transform functions such as this one to
 be used in association with the `gl:with-pushed-matrix` macro from `cl-opengl` system, which should already
 come as a dependency for this one.
 
 * `(line begin end)`
+
 [method] Draws a line between the `begin` and `end` points, where each point is a list of two coordinates
 related to the origin (normally, the top-left corner of screen). If you wish to move the origin and avoid
 vertex recalculations, I recommend looking at the `transform-*` functions and methods. The line is drawn
 taking in consideration the stroke color.
 
 * `(ellipse position size)`
+
 [method] Draws an ellipse centered at `position`, and with diameters `size`. `position` should be a list of
 two coordinates related to the origin (normally, the top-left corner of screen), while `size` should be a list
 of two numbers, specifying the horizontal and vertical diameters for the ellipse. If you wish to move the
 origin and avoid vertex recalculations, I recommend looking at the `transform-*` functions and methods.
 
 * `(arc position size start-angle stop-angle &optional (mode :OPEN))`
+
 [method] Draws an arc centered at `position`, with diameters `size`, like the `ellipse` method. However, it
 is drawn like a pie or a pizza, which is determined by `start-angle` and `stop-angle`, both in radians. The
 angles start at the left and grow counterclockwise. You may also want to specify a `mode` for drawing the
@@ -220,8 +246,7 @@ the end to the center and then to the start, making a pie-like shape). If you wi
 vertex recalculations, I recommend looking at the `transform-*` functions and methods.
 
 * `(triangle first second third)`
+
 [method] Draws a triangle using the `first`, `second` and `third` vectors. The vertices should each be a list of
 two coordinates related to the origin (normally, the top-left corner of screen). If you wish to move the origin and
 avoid vertex recalculations, I recommend looking at the `transform-*` functions and methods.
-
-
