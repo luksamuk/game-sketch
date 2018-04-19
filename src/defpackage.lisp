@@ -28,5 +28,6 @@
 	   :transform-scale
 	   :line
 	   :ellipse
+	   :rect
 	   :arc
 	   :triangle))

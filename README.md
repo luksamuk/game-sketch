@@ -245,6 +245,19 @@ the whole shape, connecting the start and the end points), or `:PIE` (similar to
 the end to the center and then to the start, making a pie-like shape). If you wish to move the origin and avoid
 vertex recalculations, I recommend looking at the `transform-*` functions and methods.
 
+* `(rect position size &optional (corner-radius nil))`
+[method] Draws a rectangle with the TOP-LEFT CORNER at `position`, with sides of size `size`. `position`
+should be a list of two coordinates, while `size` should be a list with of two dimensions: width and height
+of the rectangle. `corner-radius` is optional, and should always be a list; should it be provided, depending
+on the amount of items in the list, a rectangle with rounded borders will be drawn. For example: a zero-sized
+list (or `nil`) will yield a common rectangle; a list with only one number will yield a rectangle with four
+rounded borders, each border with the radius specified by the single item in the list; a list with four
+numbers will yield a rectangle with four rounded borders, each border having its own radius, specified by
+each list element.
+Radiuses should be specified by the order: top-left, top-right, bottom-left, bottom-right, respectfully.
+If you wish to move the origin and avoid vertex recalculations, I recommend looking at the `transform-*`
+functions and methods.
+
 * `(triangle first second third)`
 
 [method] Draws a triangle using the `first`, `second` and `third` vectors. The vertices should each be a list of

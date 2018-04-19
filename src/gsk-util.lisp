@@ -2,14 +2,6 @@
 
 #||
 
-Functions accepting colors can take a list of
-1, 3 or 4 components.
-
-;;; Draw modes for arc
-:open
-:chord
-:pie
-
 ;;; Draw modes for text
 :left
 :center
@@ -18,32 +10,9 @@ Functions accepting colors can take a list of
 :bottom
 :baseline
 
-;;; Color => ok
-(no-fill)
-(no-stroke)
-(background color)
-(stroke color)
-(stroke-weight weight)
-(fill color)
-(with-stroke-color color &body)
-(with-fill-color color &body)
-(with-stroke-weight weight &body)
-
 ;;; Window
 (size w h)
 (frame-rate)
-
-;;; Transform
-(rotate angle) => ok
-(translate position) ;; list of 2 values. Maybe vec2+generics?
-(scale factors) ;; x and y
-
-;;; Primitives
-(line begin end) ;; begin and end contain x and y of each point
-(ellipse position size)
-(arc position size start-angle stop-angle &optional (mode :open))
-(rect position size &optional (corner-radius nil)) ; either one number or list of 4 radius
-(triangle fst-vertex snd-vertex trd-vertex)
 
 ;;; Text
 (text-align mode &optional (y-mode nil)) ; if y-mode is provided, mode is x-mode
@@ -63,7 +32,7 @@ Functions accepting colors can take a list of
 
 ;;; Coloring
 (defparameter *fill-state* t)
-(defparameter *stroke-state t)
+(defparameter *stroke-state* t)
 (defparameter *fill-color* '(1 1 1 1))
 (defparameter *stroke-color* '(1 1 1 1))
 
@@ -290,8 +259,6 @@ Functions accepting colors can take a list of
       (raw-arc position size start-angle stop-angle mode t))
     (gl:polygon-mode :FRONT-AND-BACK :FILL)))
 
-;;(rect position size &optional (corner-radius nil))
-
 (defun raw-rect (position size)
   (gl:with-pushed-matrix
     (transform-translate position)
@@ -314,8 +281,107 @@ Functions accepting colors can take a list of
 	   (gl:polygon-mode :FRONT-AND-BACK :LINE)
 	   (set-color *stroke-color*)
 	   (raw-rect position size))))
-    ;; TODO: 1 and 3
-    ))
+    ;; Hmm, there is a way to do this one without so much overhead.
+    ;; Perharps it should be replaced by that?
+    (1 (let ((radius (car corner-radius)))
+	 (rect position size (list radius radius radius radius))))
+    (4 (let ((tl (car corner-radius))
+	     (tr (cadr corner-radius))
+	     (bl (caddr corner-radius))
+	     (br (cadddr corner-radius)))
+	 (multiple-value-bind (x y)
+	     (destructure-coordinates position)
+	   (multiple-value-bind (w h)
+	       (destructure-coordinates size)
+	     ;; Internal rectangles. Draw rectangles
+	     (when *fill-state*
+	       (gl:polygon-mode :FRONT-AND-BACK :FILL)
+	       (set-color *fill-color*)
+	       ;; - top-left -> bottom-left
+	       (raw-rect (list x (+ y (/ tl 2.0)))
+			 (list (/ (max tl bl) 2.0)
+			       (1+ (ceiling (- h
+					       (/ bl 2.0)
+					       (/ tl 2.0))))))
+	       ;; - bottom-left -> bottom-right
+	       (raw-rect (list (+ x (/ bl 2.0))
+			       (+ y (- h (/ (max bl br) 2.0))))
+			 (list (1+ (ceiling (- w
+					       (/ bl 2.0)
+					       (/ br 2.0))))
+			       (/ (max bl br) 2.0)))
+	       ;; - bottom-right -> top-right
+	       (raw-rect (list (+ x (- w (/ (max br bl) 2.0)))
+			       (+ y (/ tr 2.0)))
+			 (list (/ (max br bl) 2.0)
+			       (1+ (ceiling (- h
+					       (/ br 2.0)
+					       (/ tr 2.0))))))
+	       ;; - top-right -> bottom-left
+	       (raw-rect (list (+ x (/ tl 2.0))
+			       y)
+			 (list (1+ (ceiling (- w
+					       (/ tr 2.0)
+					       (/ tl 2.0))))
+			       (max tr tl)))
+	       ;; Internal rectangle
+	       (raw-rect (list (+ x (/ (max tl bl) 2.0))
+			       (+ y (/ (max tl tr) 2.0)))
+			 (list (- w
+				  (/ (max tl bl) 2.0)
+				  (/ (max tl br) 2.0))
+			       (- h
+				  (/ (max tl tr) 2.0)
+				  (/ (max bl br) 2.0)))))
+	     ;; Draw lines around borders
+	     (when *stroke-state*
+	       (gl:polygon-mode :FRONT-AND-BACK :LINE)
+	       (set-color *stroke-color*)
+	       ;; top-left -> bottom-left
+	       (line (list x (+ y (/ tl 2.0)))
+		     (list x (+ y (- h (/ bl 2.0)))))
+	       ;; bottom-left -> bottom-right
+	       (line (list (+ x (/ bl 2.0)) (+ y h))
+		     (list (+ x (- w (/ br 2.0))) (+ y h)))
+	       ;; bottom-right -> top-right
+	       (line (list (+ x w) (+ y (- h (/ br 2.0))))
+		     (list (+ x w) (+ y (/ tr 2.0))))
+	       ;; top-right -> top-left
+	       (line (list (+ x (/ tl 2.0)) y)
+		     (list (+ x (- w (/ tr 2.0))) y))
+	       (gl:polygon-mode :FRONT-AND-BACK :FILL))
+	     ;; Corner arcs
+	     (let* ((half-pi (/ pi 2.0))
+		    (3x-half-pi (* 3.0 half-pi))
+		    (tau (* pi 2.0)))
+	       ;; top-left
+	       (arc (list (+ x (/ tl 2.0))
+			  (+ y (/ tl 2.0)))
+		    (list tl tl)
+		    pi
+		    3x-half-pi)
+	       ;; top-right
+	       (arc (list (+ x (- w
+				  (/ tr 2.0)))
+			  (+ y (/ tr 2.0)))
+		    (list tr tr)
+		    3x-half-pi
+		    tau)
+	       ;; bottom-left
+	       (arc (list (+ x (/ bl 2.0))
+			  (+ y (- h
+				  (/ bl 2.0))))
+		    (list bl bl)
+		    half-pi
+		    pi)
+	       ;; bottom-right
+	       (arc (list (+ x (- w
+				  (/ br 2.0)))
+			  (+ y (- h
+				  (/ br 2.0))))
+		    (list br br)
+		    0
+		    half-pi))))))))
 
 
 (defun raw-triangle (first second third)
