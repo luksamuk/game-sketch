@@ -12,6 +12,7 @@
   :components ((:module "src"
                 :serial t
                 :components ((:file "defpackage")
+			     (:file "gsk-input")
                              (:file "gsk")
                              (:file "gsk-util"))))
   :depends-on (:sdl2

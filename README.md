@@ -87,11 +87,11 @@ You can also manually type it on the REPL.
 (defun my-draw ()
   (gl:with-pushed-matrix
     (gsk-util:transform-translate
-     (list (ash 960 -1)
-	   (ash 540 -1)))
+      (list (ash 960 -1)
+	        (ash 540 -1)))
     (gsk-util:transform-rotate *rotation*)
-    (gsk-util:with-stroke-color '(255 255 255)
-    (gsk-util:rect '(-50 -50) '(100 100) '(10 30 50 70)))))
+	  (gsk-util:with-stroke-color '(255 255 255)
+		(gsk-util:rect '(-50 -50) '(100 100) '(10 30 50 70)))))
 
 (gsk:add-update-callback 'my-update)
 (gsk:add-draw-callback 'my-draw)
@@ -265,3 +265,48 @@ functions and methods.
 [method] Draws a triangle using the `first`, `second` and `third` vectors. The vertices should each be a list of
 two coordinates related to the origin (normally, the top-left corner of screen). If you wish to move the origin and
 avoid vertex recalculations, I recommend looking at the `transform-*` functions and methods.
+
+* `(clamp value &key max min)`
+
+[macro] Yields the given value after making sure it is inside the range of `min` and `max`. If it surpasses one of
+these values, `min` or `max` will be yielded.
+
+### Input package (`gsk-input`)
+This package stores functions and variables related to user input.
+
+* `(set-button button state)`
+
+[function] Sets the state of a button. Already used internally on the sketch. Button must be one of
+`:up`, `:down`, `:left`, `:right`, `:a`, `:b`, `:x`, `:y`, or `:start`. `state` must be `nil` or
+`t`. Input is stored on an alist. The sketches follow the given button mappings:
+
+Atom     | Keyboard button
+---------------------------
+`:up`    | W
+`:down`  | S
+`:left`  | A
+`:right` | D
+`:a`     | K
+`:b`     | L
+`:x`     | J
+`:y`     | I
+`:start` | Enter
+
+* `(flip-state)`
+
+[function] Flips the button states so that the current states are copied to old button states. This
+function should be used to enable proper handling of single key presses. Already used internally on
+the sketch.
+
+* `(pressingp button)`
+
+[function] Checks for the pressing state of `button` -- whether it is being held on the current
+frame or not. Button must be one of `:up`, `:down`, `:left`, `:right`, `:a`, `:b`, `:x`, `:y`,
+or `:start`. To view the default key bindings, see `set-button`.
+
+* `(pressedp button)`
+
+[function] Checks for the single press state of `button` -- whether it is being held on the current
+frame, but wasn't held on the last frame. Button must be one of `:up`, `:down`, `:left`, `:right`,
+`:a`, `:b`, `:x`, `:y`, or `:start`. To view the default key bindings, see `set-button`.
+

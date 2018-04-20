@@ -79,16 +79,57 @@
       ;;(init)
       (sdl2:with-event-loop (:method :poll)
         (:quit () t)
+	;; Mappings:
+	;; WASD  = Directionals
+	;; IJKL  = YXAB
+	;; Enter = Start
         (:keyup (:keysym keysym)
-                (declare (ignore keysym)))
+		(when (sdl2:scancode= (sdl2:scancode-value keysym) :scancode-w)
+		  (gsk-input:set-button :up nil))
+		(when (sdl2:scancode= (sdl2:scancode-value keysym) :scancode-a)
+		  (gsk-input:set-button :left nil))
+		(when (sdl2:scancode= (sdl2:scancode-value keysym) :scancode-s)
+		  (gsk-input:set-button :down nil))
+		(when (sdl2:scancode= (sdl2:scancode-value keysym) :scancode-d)
+		  (gsk-input:set-button :right nil))
+		(when (sdl2:scancode= (sdl2:scancode-value keysym) :scancode-i)
+		  (gsk-input:set-button :y nil))
+		(when (sdl2:scancode= (sdl2:scancode-value keysym) :scancode-j)
+		  (gsk-input:set-button :x nil))
+		(when (sdl2:scancode= (sdl2:scancode-value keysym) :scancode-k)
+		  (gsk-input:set-button :a nil))
+		(when (sdl2:scancode= (sdl2:scancode-value keysym) :scancode-l)
+		  (gsk-input:set-button :b nil))
+		(when (sdl2:scancode= (sdl2:scancode-value keysym) :scancode-return)
+		  (gsk-input:set-button :start nil)))
         (:keydown (:keysym keysym)
-                  (declare (ignore keysym)))
+                  (when (sdl2:scancode= (sdl2:scancode-value keysym) :scancode-w)
+		    (gsk-input:set-button :up t))
+		  (when (sdl2:scancode= (sdl2:scancode-value keysym) :scancode-a)
+		    (gsk-input:set-button :left t))
+		  (when (sdl2:scancode= (sdl2:scancode-value keysym) :scancode-s)
+		    (gsk-input:set-button :down t))
+		  (when (sdl2:scancode= (sdl2:scancode-value keysym) :scancode-d)
+		    (gsk-input:set-button :right t))
+		  (when (sdl2:scancode= (sdl2:scancode-value keysym) :scancode-i)
+		    (gsk-input:set-button :y t))
+		  (when (sdl2:scancode= (sdl2:scancode-value keysym) :scancode-j)
+		    (gsk-input:set-button :x t))
+		  (when (sdl2:scancode= (sdl2:scancode-value keysym) :scancode-k)
+		    (gsk-input:set-button :a t))
+		  (when (sdl2:scancode= (sdl2:scancode-value keysym) :scancode-l)
+		    (gsk-input:set-button :b t))
+		  (when (sdl2:scancode= (sdl2:scancode-value keysym) :scancode-return)
+		    (gsk-input:set-button :start t)))
+
+	;; No joy input yet
         (:joyaxismotion (:which controller-id :axis axis-id :value value)
                         (declare (ignore controller-id axis-id value)))
         (:joybuttondown (:which controller-id :button button-id)
                         (declare (ignore controller-id button-id)))
         (:joybuttonup (:which controller-id :button button-id)
                       (declare (ignore controller-id button-id)))
+	
         (:idle ()
                #+(and sbcl (not sb-thread))
                (restartable (sb-sys:serve-all-events 0))
@@ -105,6 +146,8 @@
                (loop for draw-function in *sketch-draw-hook*
                   do (restartable (funcall draw-function)))
                (sdl2:gl-swap-window *window*)
+
+	       (gsk-input:flip-state)
                                     
                (bt:with-lock-held (*next-frame-hook-mutex*)
                  (loop for i in *next-frame-hook*

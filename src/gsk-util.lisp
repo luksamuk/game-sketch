@@ -20,10 +20,8 @@
 (text string position)
 
 ;;; Misc
-(draw-box &key width height)
 (get-distance fst-point snd-point) ; really necessary? Better avoid sqrts
 ;; there also was a random function which might be unecessary. Maybe a macro if needed?
-
 
 ;; also wondering about some texture/atlas/animation utils, should come in handy
 
@@ -402,3 +400,8 @@
     (raw-triangle first second third))
   (gl:polygon-mode :FRONT-AND-BACK :FILL))
 
+
+
+;;; Extra
+(defmacro clamp (value &key max min)
+  `(min ,max (max ,min ,value)))

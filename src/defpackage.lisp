@@ -1,5 +1,12 @@
-(defpackage gsk
+(defpackage gsk-input
   (:use :cl)
+  (:export :set-button
+	   :flip-state
+	   :pressingp
+	   :pressedp))
+
+(defpackage gsk
+  (:use :cl :gsk-input)
   (:export :next-frame
            :add-update-callback
            :add-draw-callback
@@ -30,4 +37,5 @@
 	   :ellipse
 	   :rect
 	   :arc
-	   :triangle))
+	   :triangle
+	   :clamp))
