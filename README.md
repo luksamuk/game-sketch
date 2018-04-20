@@ -280,17 +280,17 @@ This package stores functions and variables related to user input.
 `:up`, `:down`, `:left`, `:right`, `:a`, `:b`, `:x`, `:y`, or `:start`. `state` must be `nil` or
 `t`. Input is stored on an alist. The sketches follow the given button mappings:
 
-Atom     | Keyboard button
----------------------------
-`:up`    | W
-`:down`  | S
-`:left`  | A
-`:right` | D
-`:a`     | K
-`:b`     | L
-`:x`     | J
-`:y`     | I
-`:start` | Enter
+|Atom     | Keyboard button |
+|:-------:|:----------------|
+|`:up`    | W               |
+|`:down`  | S               |
+|`:left`  | A               |
+|`:right` | D               |
+|`:a`     | K               |
+|`:b`     | L               |
+|`:x`     | J               |
+|`:y`     | I               |
+|`:start` | Enter           |
 
 * `(flip-state)`
 
