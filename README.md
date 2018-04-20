@@ -104,8 +104,6 @@ You can also manually type it on the REPL.
 * For now, the system is set to create a window with an exact 960x540 size.
 * In my system, the GPU forces the application to use a 60FPS framerate, but the application itself doesn't
 have that cap; you may want to interpolate your logic using the `delta-time` parameter of your `update` function.
-* The sketches still don't perform a blending test, so it doesn't yet blend colors with an alpha component properly.
-Will be solved very soon, as this is an easy fix.
 * There may also be undiscovered bugs, so file up an issue if needed.
 
 ## Documentation
@@ -119,11 +117,14 @@ This package stores functions and macros related to the running sketch itself.
 
 * `(add-update-callback update-function)`
 
-[function] Adds `update-function` to the update functions hook.
+[function] Adds `update-function` to the update functions hook. `update-function` must be
+a function which accepts a single parameter, normally called `delta-time`. You may use this
+parameter to interpolate your game logic.
 
 * `(add-draw-callback draw-function)`
 
-[function] Adds `draw-function` to the draw functions hook.
+[function] Adds `draw-function` to the draw functions hook. `draw-function` must be a function
+which doesn't accept any parameter.
 
 * `(reset-callbacks)`
 
@@ -160,22 +161,22 @@ This package stores functions, macros and variables related to drawing primitive
 
 [function] Forces the sketch to stop outlining primitives with solid colors.
 
-* `(background ((color list)))`
+* `(background (color list))`
 
 [method] Changes the background color of the sketch to the given `color` list. The list may have three (red,
 green, blue) or four (red, green, blue, alpha) components. The components are defined in a range [0-255].
 
-* `(stroke ((color number))`
+* `(stroke (color number))`
 
 [method] Changes the outline color of the next drawn primitives to `color`. `color` is a single number in the
 range [0-255], which will be used as the red, green and blue color components.
 
-* `(stroke ((color list)))`
+* `(stroke (color list))`
 
 [method] Changes the outline color of the next drawn primitives to `color`. `color` is a list of three (red,
 green, blue) or four (red, green, blue, alpha) components. Each component ranges [0-255].
 
-* `(with-stroke-color (color &body body))`
+* `(with-stroke-color color &body body)`
 
 [macro] Changes the outline color to `color` for all primitives drawn on `body`, then forces the sketch to
 stop using outlines at the end. For information on how to specify a color, see the `stroke` methods.
@@ -184,12 +185,12 @@ stop using outlines at the end. For information on how to specify a color, see t
 
 [function] Forces the outline to assume a specific level of thickness of `weight`. Defaults to `1.0`.
 
-* `(fill-primitive ((color list)))`
+* `(fill-primitive (color list))`
 
 [method] Changes the fill color of the next drawn primitives to `color`. `color` is a list of three (red,
 green, blue) or four (red, green, blue, alpha) components. Each component ranges [0-255].
 
-* `(with-fill-color (color &body body))`
+* `(with-fill-color color &body body)`
 
 [macro] Changes the fill color to `color` for all primitives drawn on `body`, then forces the sketch to
 stop filling primitives at the end. For information on how to specify a color, see the `fill-primitive` methods.
@@ -208,14 +209,14 @@ stop filling primitives at the end. For information on how to specify a color, s
 functions such as this one to be used in association with the `gl:with-pushed-matrix` macro from `cl-opengl`
 system, which should already come as a dependency for this one.
 
-* `(transform-translate ((position list)))`
+* `(transform-translate (position list))`
 
 [method] Translates the current matrix to `position`, where `position` is a list of two or three coordinates
 (the third coordinate is ignored for now, and defaults to 0). I recommend transform functions such as this
 one to be used in association with the `gl:with-pushed-matrix` macro from `cl-opengl` system, which should
 already come as a dependency for this one.
 
-* `(transform-scale ((factors list)))`
+* `(transform-scale (factors list))`
 
 [method] Scales the current matrix by `factors`, where `factors` is a list of two or three scaling factors
 (the third factor is ignored for now, and defaults to 1). I recommend transform functions such as this one to
