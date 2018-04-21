@@ -64,6 +64,17 @@
   (gl:load-identity)
   (gl:clear-color 0.0 0.0 0.0 1.0))
 
+(defun init ()
+  (gsk-input:set-button :up nil)
+  (gsk-input:set-button :down nil)
+  (gsk-input:set-button :left nil)
+  (gsk-input:set-button :right nil)
+  (gsk-input:set-button :a nil)
+  (gsk-input:set-button :b nil)
+  (gsk-input:set-button :x nil)
+  (gsk-input:set-button :y nil)
+  (gsk-input:set-button :start nil))
+
 (defun sketch-runner ()
   (sdl2:with-init (:video :joystick)
     (setf *window*
@@ -80,7 +91,7 @@
     ;;(setf (sdl2:frame-rate) 60)
     (let ((previous-tick (sdl2:get-ticks)))
       (setup-view)
-      ;;(init)
+      (init)
       (sdl2:with-event-loop (:method :poll)
         (:quit () t)
 	;; Mappings:
