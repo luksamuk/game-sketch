@@ -1,6 +1,5 @@
 (in-package :gsk-input)
 
-
 (defparameter *current-state* '((:up nil)
 				(:down nil)
 				(:left nil)
@@ -18,7 +17,7 @@
 	state))
 
 (defun flip-state ()
-  (setf *previous-state* (copy-list *current-state*)))
+  (setf *previous-state* (copy-tree *current-state*)))
 
 (defun pressingp (button)
   (cdr (assoc button *current-state*)))

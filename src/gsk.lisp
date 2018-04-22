@@ -73,7 +73,8 @@
   (gsk-input:set-button :b nil)
   (gsk-input:set-button :x nil)
   (gsk-input:set-button :y nil)
-  (gsk-input:set-button :start nil))
+  (gsk-input:set-button :start nil)
+  (gsk-input:flip-state))
 
 (defun sketch-runner ()
   (sdl2:with-init (:video :joystick)
@@ -154,15 +155,15 @@
                                       0
                                       dt-proto)))
                  (setf previous-tick (sdl2:get-ticks))
-                 (loop for update-function in *sketch-update-hook*
+
+		 (loop for update-function in *sketch-update-hook*
                     do (restartable (funcall update-function delta-time))))
 
                (gl:clear :color-buffer :depth-buffer)
                (loop for draw-function in *sketch-draw-hook*
-                  do (restartable (funcall draw-function)))
+                  do (restartable (funcall draw-function))
+		  finally (gsk-input:flip-state))
                (sdl2:gl-swap-window *window*)
-
-	       (gsk-input:flip-state)
                                     
                (bt:with-lock-held (*next-frame-hook-mutex*)
                  (loop for i in *next-frame-hook*
