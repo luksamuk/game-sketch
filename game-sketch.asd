@@ -16,5 +16,6 @@
                              (:file "gsk")
                              (:file "gsk-util"))))
   :depends-on (:sdl2
+	       :sdl2-image
                :cl-opengl
                :bordeaux-threads))

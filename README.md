@@ -10,11 +10,14 @@ This software is distributed under the MIT License. See `LICENSE` for details.
 Before using `game-sketch`, make sure you have the following dependencies:
 
 * OpenGL 2.x support;
-* SDL2 installed.
+* SDL2 installed;
+* SDL2_Image installed.
 
-If you're using Windows, you can drop the [SDL2 Win32 runtime library](https://www.libsdl.org/download-2.0.php)
-on the same folder you've opened your REPL. If you're using Emacs+SLIME/Portacle, just drop it
-on the same folder you've saved your sketch's `.lisp` files or your system.
+If you're using Windows, you can drop both the [SDL2 Win32 runtime library](https://www.libsdl.org/download-2.0.php)
+and the [SDL2\_image Win32 runtime library](https://www.libsdl.org/projects/SDL_image/)
+on the same folder you've opened your REPL. If you're using Emacs+SLIME/Portacle,
+just drop it on the same folder you've saved your sketch's `.lisp` files or
+your system.
 
 Or you may also add the runtime to your Windows system PATH variable.
 
