@@ -38,4 +38,8 @@
 	   :rect
 	   :arc
 	   :triangle
-	   :clamp))
+	   :clamp
+	   :set-font-texture
+	   :text-align
+	   :text-size
+	   :text))

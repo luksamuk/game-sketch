@@ -405,3 +405,118 @@
 ;;; Extra
 (defmacro clamp (value &key max min)
   `(min ,max (max ,min ,value)))
+
+;;; Text
+(defparameter *font-texture* nil)
+(defparameter *font-texture-size* nil)
+(defparameter *font-glyph-size* nil)
+(defparameter *font-glyph-texel-size* nil)
+(defparameter *font-align* (list :left :center))
+(defparameter *font-size* 1.0)
+(defparameter *font-glyphs-per-line* 1)
+
+(defmethod set-font-texture ((pathname string) (glyph-size list))
+  (let* ((surface (sdl2-image:load-image pathname))
+	 (gl-texture nil)
+	 (texture-size (list (sdl2:surface-width surface)
+			     (sdl2:surface-height surface))))
+    (gl:enable :texture-2d)
+    (setf gl-texture (car (gl:gen-textures 1)))
+    (gl:bind-texture :texture-2d gl-texture)
+    (gl:tex-parameter :texture-2d :texture-wrap-s :clamp-to-edge)
+    (gl:tex-parameter :texture-2d :texture-wrap-t :clamp-to-edge)
+    (gl:tex-parameter :texture-2d :texture-min-filter :nearest)
+    (gl:tex-parameter :texture-2d :texture-mag-filter :nearest)
+    (gl:tex-image-2d :texture-2d
+		     0
+		     :rgba
+		     (car texture-size)
+		     (cadr texture-size)
+		     0
+		     :rgba
+		     :unsigned-byte
+		     (sdl2:surface-pixels surface))
+    (gl:finish)
+    (gl:disable :texture-2d)
+    (setf *font-texture* gl-texture)
+    (setf *font-texture-size* texture-size)
+    (setf *font-glyphs-per-line* (floor (/ (car texture-size)
+					   (car glyph-size))))
+    (setf *font-glyph-size* glyph-size)
+    (setf *font-glyph-texel-size* (list (/ (car glyph-size)
+					   (car texture-size))
+					(/ (cadr glyph-size)
+					   (cadr texture-size))))))
+
+(defmethod text-align ((mode symbol))
+  (setf (car *text-align*) mode))
+
+(defmethod text-align ((modes list))
+  (setf *text-align*
+	(list (if (null (car modes))
+		  :left
+		  (car modes))
+	      (if (null (cadr modes))
+		  :center
+		  (cadr modes)))))
+
+(defun text-size (size)
+  (setf *font-size* size))
+
+(defun draw-glyph (glyph)
+  (when (not (= glyph 1))
+    (let ((texel-position (list (* (mod glyph
+					*font-glyphs-per-line*)
+				   (car *font-glyph-texel-size*))
+				(* (floor (/ glyph
+					     *font-glyphs-per-line*))
+				   (cadr *font-glyph-texel-size*))))
+	  (hw (* (/ (car *font-glyph-size*) 2.0) *font-size*))
+	  (hh (* (/ (cadr *font-glyph-size*) 2.0) *font-size*)))
+      #||(gl:with-primitive :quads
+	(gl:tex-coord (car texel-position)
+		      (cadr texel-position))
+	(gl:vertex (- hw) (- hh))
+	(gl:tex-coord (+ (car texel-position)
+			 (car *font-glyph-texel-size*))
+		      (cadr texel-position))
+	(gl:vertex hw (- hh))
+	(gl:tex-coord (+ (car texel-position)
+			 (car *font-glyph-texel-size*))
+		      (+ (cadr texel-position)
+			 (cadr *font-glyph-texel-size*)))
+	(gl:vertex hw hh)
+	(gl:tex-coord (car texel-position)
+		      (+ (cadr texel-position)
+			 (cadr *font-glyph-texel-size*)))
+      (gl:vertex (- hw) hh))||#
+      (gl:with-primitive :quads
+	(gl:tex-coord 0 0)
+	(gl:vertex 0 0)
+	(gl:tex-coord 1 0)
+	(gl:vertex (car *font-texture-size*) 0)
+	(gl:tex-coord 1 1)
+	(gl:vertex (car *font-texture-size*) (cadr *font-texture-size*))
+	(gl:tex-coord 0 1)
+	(gl:vertex 0 (cadr *font-texture-size*)))
+      )))
+    
+
+(defmethod text ((string string) (position list))
+  (when (not (null *font-texture*))
+    (gl:enable :texture-2d)
+    (gl:with-pushed-matrix
+      (transform-translate position)
+      (set-color *fill-color*)
+      (gl:with-pushed-matrix
+	;; I'll have to be honest, I was supposed to
+	;; deal with alignment here, but I just want it
+	;; to work for now
+	(gl:bind-texture :texture-2d *font-texture*)
+	(gl:tex-env :texture-env :texture-env-mode :modulate)
+	(loop for c across string
+	   do (draw-glyph (- (char-code c) 31))
+	   ;; No handling of \n here yet...
+	     (transform-translate (list (car *font-glyph-size*) 0)))))
+    (gl:disable :texture-2d)))
+
