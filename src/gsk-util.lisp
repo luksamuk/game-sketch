@@ -506,6 +506,7 @@
 	(loop for c across string
 	   do (draw-glyph (- (char-code c) 31))
 	   ;; No handling of \n here yet...
-	     (transform-translate (list (car *font-glyph-size*) 0)))))
+	     (transform-translate (list (* (car *font-glyph-size*) *font-size*)
+					0)))))
     (gl:disable :texture-2d)))
 
