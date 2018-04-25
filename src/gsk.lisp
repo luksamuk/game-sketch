@@ -12,6 +12,7 @@
 (defvar *next-frame-hook-mutex* (bt:make-lock "frame-hook-lock"))
 (defparameter *next-frame-hook* nil)
 
+(defparameter *sketch-setup-hook* nil)
 (defparameter *sketch-update-hook* nil)
 (defparameter *sketch-draw-hook* nil)
 
@@ -27,6 +28,10 @@
   "Executes a command and calls the next frame."
   `(bt:with-lock-held (*next-frame-hook-mutex*)
      (progn (push (lambda () ,@body) *next-frame-hook*))))
+
+(defun add-setup-callback (setup-function)
+  "Adds a setup function to the setup hook."
+  (push setup-function *sketch-setup-hook*))
 
 (defun add-update-callback (update-function)
   "Adds an update function to the update hook."
@@ -93,6 +98,8 @@
     (let ((previous-tick (sdl2:get-ticks)))
       (setup-view)
       (init)
+      (loop for setup-function in *sketch-setup-hook*
+	 do (funcall setup-function))
       (sdl2:with-event-loop (:method :poll)
         (:quit () t)
 	;; Mappings:
@@ -171,6 +178,7 @@
                  (setf *next-frame-hook* nil))))
       (loop for (i . controller) in *game-controllers*
          do (sdl2:game-controller-close controller))
+      ;; TODO HERE: Delete created texture
       (sdl2:gl-delete-context *gl-context*)
       (sdl2:destroy-window *window*))))
 

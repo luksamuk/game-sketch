@@ -417,11 +417,10 @@
 
 (defmethod set-font-texture ((pathname string) (glyph-size list))
   (let* ((surface (sdl2-image:load-image pathname))
-	 (gl-texture nil)
+	 (gl-texture (car (gl:gen-textures 1)))
 	 (texture-size (list (sdl2:surface-width surface)
 			     (sdl2:surface-height surface))))
     (gl:enable :texture-2d)
-    (setf gl-texture (car (gl:gen-textures 1)))
     (gl:bind-texture :texture-2d gl-texture)
     (gl:tex-parameter :texture-2d :texture-wrap-s :clamp-to-edge)
     (gl:tex-parameter :texture-2d :texture-wrap-t :clamp-to-edge)
@@ -464,7 +463,7 @@
   (setf *font-size* size))
 
 (defun draw-glyph (glyph)
-  (when (not (= glyph 1))
+  (when (> glyph 1)
     (let ((texel-position (list (* (mod glyph
 					*font-glyphs-per-line*)
 				   (car *font-glyph-texel-size*))
@@ -473,7 +472,7 @@
 				   (cadr *font-glyph-texel-size*))))
 	  (hw (* (/ (car *font-glyph-size*) 2.0) *font-size*))
 	  (hh (* (/ (cadr *font-glyph-size*) 2.0) *font-size*)))
-      #||(gl:with-primitive :quads
+      (gl:with-primitive :quads
 	(gl:tex-coord (car texel-position)
 		      (cadr texel-position))
 	(gl:vertex (- hw) (- hh))
@@ -489,17 +488,7 @@
 	(gl:tex-coord (car texel-position)
 		      (+ (cadr texel-position)
 			 (cadr *font-glyph-texel-size*)))
-      (gl:vertex (- hw) hh))||#
-      (gl:with-primitive :quads
-	(gl:tex-coord 0 0)
-	(gl:vertex 0 0)
-	(gl:tex-coord 1 0)
-	(gl:vertex (car *font-texture-size*) 0)
-	(gl:tex-coord 1 1)
-	(gl:vertex (car *font-texture-size*) (cadr *font-texture-size*))
-	(gl:tex-coord 0 1)
-	(gl:vertex 0 (cadr *font-texture-size*)))
-      )))
+	(gl:vertex (- hw) hh)))))
     
 
 (defmethod text ((string string) (position list))

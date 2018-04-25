@@ -8,6 +8,7 @@
 (defpackage gsk
   (:use :cl :gsk-input)
   (:export :next-frame
+	   :add-setup-callback
            :add-update-callback
            :add-draw-callback
            :reset-callbacks
