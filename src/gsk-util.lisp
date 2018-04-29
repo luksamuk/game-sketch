@@ -14,15 +14,6 @@
 (size w h)
 (frame-rate)
 
-;;; Text
-(text-align mode &optional (y-mode nil)) ; if y-mode is provided, mode is x-mode
-(text-size size)
-(text string position)
-
-;;; Misc
-(get-distance fst-point snd-point) ; really necessary? Better avoid sqrts
-;; there also was a random function which might be unecessary. Maybe a macro if needed?
-
 ;; also wondering about some texture/atlas/animation utils, should come in handy
 
 ||#

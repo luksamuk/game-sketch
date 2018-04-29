@@ -118,6 +118,12 @@ This package stores functions and macros related to the running sketch itself.
 
 [macro] Evaluates body once, on the next available frame of the application.
 
+* `(add-setup-callback setup-function)`
+
+[function] Adds `setup-function` to the setup functions hook. `setup-function` must be a
+function which doesn't accept any parameter. Mind that all functions added to this hook
+will be called only once, and then the hook will be cleaned up.
+
 * `(add-update-callback update-function)`
 
 [function] Adds `update-function` to the update functions hook. `update-function` must be
@@ -133,7 +139,7 @@ which doesn't accept any parameter.
 
 [function] Clears all available function hooks.
 
-* `run-sketch`
+* `(run-sketch)`
 
 [function] Runs the current sketch as it is.
 
@@ -274,6 +280,42 @@ avoid vertex recalculations, I recommend looking at the `transform-*` functions 
 
 [macro] Yields the given value after making sure it is inside the range of `min` and `max`. If it surpasses one of
 these values, `min` or `max` will be yielded.
+
+* `(set-font-texture pathname glyphsize)`
+
+[method] Loads a textured font from pathname. The texture itself must be comprised of sequential (left to right,
+top to bottom) glyphs of every character ranging from 31 (no real glyph associated; use it as a white square)
+to 126 (tilde, ~). It is advised to leave a padding between the glyphs. glyphsize must be a list of two numbers,
+describing the size for each glyph: width and height. Remember to take the given padding in consideration, and
+that this font must be a monospaced one. Plus, be mindful that it is advised to call this method inside a setup
+function; calling it outside the execution scope of the sketch (setup/update/draw) will most likely have no
+effect, since no OpenGL context is initialized.
+
+* `(text-align mode)`
+
+[method] Sets the horizontal alignment for text. Can be one of :left, :center or :right. This method assumes
+the vertical alignment to be always :top.
+Please notice that, though this method works, it currently has no effect on the printed text.
+
+* `(text-align modes)`
+
+[method] Sets both the horizontal and vertical alignment for the text. modes is a list comprised of a horizontal
+and vertical alignment information, respectively. Horizontal alignment can be one of :left, :center or :right;
+vertical alignment can be one of :top, :center, :bottom or :baseline.
+The text alignment defaults to :left and :top.
+Please notice that, though this method works, it currently has no effect on the printed text.
+
+* `(text-size size)`
+
+[function] Sets the text size. size must be a multiplier for the original size of the text on its texture,
+and defaults to 1.0. In practice, this simply magnifies the printed texture, using near-point interpolation.
+
+* `(text string position)`
+
+[method] Prints a text in the given position. string is the actual text to be printed, while position is a
+list of two numbers, indicating the X and Y coordinates of the text, relative to origin. The printed text
+will always follow the given fill color, which you can set using fill-primitive or with-fill-color.
+This method doesn't handle new-line characters yet.
 
 ### Input package (`gsk-input`)
 This package stores functions and variables related to user input.

@@ -43,6 +43,7 @@
 
 (defun reset-callbacks ()
   "Removes all function callbacks on all hooks."
+  (setf *sketch-setup-hook* nil)
   (setf *sketch-update-hook* nil)
   (setf *sketch-draw-hook* nil))
 
@@ -100,6 +101,7 @@
       (init)
       (loop for setup-function in *sketch-setup-hook*
 	 do (funcall setup-function))
+      (setf *sketch-setup-hook* nil)
       (sdl2:with-event-loop (:method :poll)
         (:quit () t)
 	;; Mappings:
@@ -146,12 +148,19 @@
 		    (gsk-input:set-button :start t)))
 
 	;; No joy input yet
-        (:joyaxismotion (:which controller-id :axis axis-id :value value)
-                        (declare (ignore controller-id axis-id value)))
-        (:joybuttondown (:which controller-id :button button-id)
-                        (declare (ignore controller-id button-id)))
-        (:joybuttonup (:which controller-id :button button-id)
-                      (declare (ignore controller-id button-id)))
+        ;;(:joyaxismotion (:which controller-id :axis axis-id :value value)
+        ;;                (declare (ignore controller-id axis-id value)))
+        ;;(:joybuttondown (:which controller-id :button button-id)
+        ;;                (declare (ignore controller-id button-id)))
+        ;;(:joybuttonup (:which controller-id :button button-id)
+        ;;              (declare (ignore controller-id button-id)))
+
+	(:controlleraxismotion (:which controller-id :axis axis-id :value value)
+			       (declare (ignore controller-id axis-id value)))
+	(:controllerbuttondown (:which controller-id :button button-id)
+			       (declare (ignore controller-id button-id)))
+        (:controllerbuttonup (:which controller-id :button button-id)
+			     (declare (ignore controller-id button-id)))
 	
         (:idle ()
                #+(and sbcl (not sb-thread))
