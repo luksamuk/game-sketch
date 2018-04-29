@@ -101,7 +101,6 @@
       (init)
       (loop for setup-function in *sketch-setup-hook*
 	 do (funcall setup-function))
-      (setf *sketch-setup-hook* nil)
       (sdl2:with-event-loop (:method :poll)
         (:quit () t)
 	;; Mappings:

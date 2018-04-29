@@ -122,7 +122,7 @@ This package stores functions and macros related to the running sketch itself.
 
 [function] Adds `setup-function` to the setup functions hook. `setup-function` must be a
 function which doesn't accept any parameter. Mind that all functions added to this hook
-will be called only once, and then the hook will be cleaned up.
+will be called only once, when the sketch loads.
 
 * `(add-update-callback update-function)`
 
